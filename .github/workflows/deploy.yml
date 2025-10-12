@@ -1,4 +1,4 @@
-name: Deploy to Vercel
+name: Deploy to Netlify
 
 on:
   push:
@@ -38,6 +38,6 @@ jobs:
           cd frontend
           npm run build
 
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v1.2
         
