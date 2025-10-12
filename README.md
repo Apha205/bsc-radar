@@ -40,7 +40,7 @@ npm run dev
 
 ### Automatic CI/CD
 - Push to `main` branch triggers GitHub Actions
-- Automatically deploys to Vercel
+- Automatically deploys to Netlify
 - Includes linting and build verification
 
 ### Manual Deployment
@@ -55,10 +55,9 @@ npm run export
 ### Backend
 - `BSCSCAN_API_KEY`: BscScan API key (optional, for enhanced features)
 
-### Vercel (GitHub Secrets)
-- `VERCEL_TOKEN`: Vercel authentication token
-- `VERCEL_ORG_ID`: Vercel organization ID
-- `VERCEL_PROJECT_ID`: Vercel project ID
+### Netlify (GitHub Secrets)
+- `NETLIFY_AUTH_TOKEN`: Netlify authentication token
+- `NETLIFY_SITE_ID`: Netlify site ID
 
 ## API Endpoints
 
