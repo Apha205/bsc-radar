@@ -1,36 +1,103 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BSC Token Insight
 
-## Getting Started
+A modern web application for real-time BSC token analysis and insights.
 
-First, run the development server:
+## Features
 
+- 🚀 Fast token information retrieval
+- 📊 Real-time DexScreener charts
+- 🫧 Holder distribution analysis (Bubblemaps)
+- 💧 Liquidity and volume tracking
+- ⚡ Optimized performance (~1 second response time)
+- 🎨 Sleek dark UI with green accents
+
+## Tech Stack
+
+- **Frontend**: Next.js 15, TypeScript, Tailwind CSS
+- **Backend**: FastAPI, Python 3.13
+- **APIs**: DexScreener, Bubblemaps
+- **Deployment**: Vercel (Frontend), GitHub Actions CI/CD
+
+## Local Development
+
+### Backend
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd backend
+python -m venv venv
+venv\Scripts\activate  # Windows
+pip install -r requirements.txt
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Automatic CI/CD
+- Push to `main` branch triggers GitHub Actions
+- Automatically deploys to Vercel
+- Includes linting and build verification
 
-## Learn More
+### Manual Deployment
+```bash
+cd frontend
+npm run build
+npm run export
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Environment Variables
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Backend
+- `BSCSCAN_API_KEY`: BscScan API key (optional, for enhanced features)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Vercel (GitHub Secrets)
+- `VERCEL_TOKEN`: Vercel authentication token
+- `VERCEL_ORG_ID`: Vercel organization ID
+- `VERCEL_PROJECT_ID`: Vercel project ID
 
-## Deploy on Vercel
+## API Endpoints
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### POST /api/token-info
+Fetch token information by contract address.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Request:**
+```json
+{
+  "address": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Data fetched successfully",
+  "data": {
+    "name": "Wrapped BNB",
+    "symbol": "WBNB",
+    "contract_address": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+    "liquidity": "29971815.82",
+    "volume": "1139193855.81",
+    "pair_address": "0x172fcD41E0913e95784454622d1c3724f546f849",
+    "bubblemaps_url": "https://v2.bubblemaps.io/token/0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+    "updated_at": "2025-10-12T13:38:22.943880"
+  }
+}
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## License
+
+MIT License - see LICENSE file for details.

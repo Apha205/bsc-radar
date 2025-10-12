@@ -3,7 +3,7 @@ import json
 
 def test_token_info():
     url = "http://localhost:8000/api/token-info"
-    address = "0x8076c74c5e3f5852037f31ff0093eeb8c8add8d3"  # Provided test address
+    address = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"  # WBNB test address
 
     payload = {"address": address}
     headers = {"Content-Type": "application/json"}

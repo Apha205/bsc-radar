@@ -1,12 +1,10 @@
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, validator
-import httpx
-import asyncio
+import requests
 from cachetools import TTLCache
 from datetime import datetime
-from services.api_service import fetch_from_dexscreener, fetch_from_bscscan, fetch_contract_creation, fetch_top_holders, check_liquidity_lock
-from services.scraping_service import scrape_bubblemaps_data
+from services.api_service import fetch_from_dexscreener_sync
 import re
 import logging
 
@@ -42,7 +40,8 @@ class TokenResponse(BaseModel):
     data: dict = None
 
 @app.post("/api/token-info", response_model=TokenResponse)
-async def get_token_info(request: TokenRequest):
+def get_token_info(request: TokenRequest):
+    start_time = datetime.utcnow()
     address = request.address.lower()
 
     # Check cache
@@ -53,24 +52,17 @@ async def get_token_info(request: TokenRequest):
         return TokenResponse(success=True, message="Data fetched from cache", data=cached_data)
 
     try:
-        # Fetch from APIs concurrently
-        dexscreener_data, bscscan_data = await asyncio.gather(
-            fetch_from_dexscreener(address),
-            fetch_from_bscscan(address)
-        )
-        # Skip slow calls for now to improve speed
-        top_holders = []
-        liquidity_lock = 'Unknown'
-        contract_info = {'creator': 'Unknown', 'creation_date': 'Unknown'}
+        # Fetch only from DexScreener for speed
+        dexscreener_data = fetch_from_dexscreener_sync(address)
 
         # Combine data - ensure all values are strings
         combined_data = {
-            'name': str(bscscan_data.get('name', dexscreener_data.get('name', ''))),
-            'symbol': str(bscscan_data.get('symbol', dexscreener_data.get('symbol', ''))),
+            'name': str(dexscreener_data.get('name', '')),
+            'symbol': str(dexscreener_data.get('symbol', '')),
             'contract_address': address,
             'liquidity': str(dexscreener_data.get('liquidity', '')),
             'volume': str(dexscreener_data.get('volume', '')),
-            'holders': str(bscscan_data.get('holders', '')),
+            'holders': str(dexscreener_data.get('holders', '')),
             'pair_address': str(dexscreener_data.get('pair_address', '')),
         }
 
@@ -87,7 +79,9 @@ async def get_token_info(request: TokenRequest):
         # Cache the result
         cache[address] = combined_data
 
-        logger.info(f"Successfully fetched data for token: {combined_data.get('name', 'Unknown')} ({address})")
+        end_time = datetime.utcnow()
+        response_time = (end_time - start_time).total_seconds()
+        logger.info(f"Successfully fetched data for token: {combined_data.get('name', 'Unknown')} ({address}) in {response_time:.2f}s")
         try:
             response = TokenResponse(success=True, message="Data fetched successfully", data=combined_data)
             return response

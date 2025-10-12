@@ -256,6 +256,20 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {/* Footer */}
+      <footer className="w-full py-6 bg-black/50 backdrop-blur-sm border-t border-[#00FF88]/20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <p className="text-gray-400 text-sm">
+              Powered by <span className="text-[#00FF88] font-semibold">DexScreener</span> & <span className="text-[#00FF88] font-semibold">Bubblemaps</span>
+            </p>
+            <p className="text-gray-500 text-xs mt-2">
+              BSC Token Insight - Real-time DeFi analytics for traders
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   </>
 );

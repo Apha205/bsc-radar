@@ -1,4 +1,4 @@
-import httpx
+import requests
 import os
 from typing import Dict, Any, List
 from datetime import datetime
@@ -9,12 +9,11 @@ BSCSCAN_BASE_URL = "https://api.bscscan.com/api"
 # Assume API key is set in env
 BSCSCAN_API_KEY = os.getenv("BSCSCAN_API_KEY", "YourApiKeyToken")  # Replace with actual key
 
-async def fetch_from_dexscreener(address: str) -> Dict[str, Any]:
+def fetch_from_dexscreener_sync(address: str) -> Dict[str, Any]:
     url = f"{DEXSCREENER_BASE_URL}{address}"
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url)
-        response.raise_for_status()
-        data = response.json()
+    response = requests.get(url, timeout=10)
+    response.raise_for_status()
+    data = response.json()
 
     if not data.get('pairs'):
         return {}
