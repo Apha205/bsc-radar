@@ -6,8 +6,12 @@ import asyncio
 from cachetools import TTLCache
 from datetime import datetime
 from services.api_service import fetch_from_dexscreener, fetch_from_bscscan, fetch_contract_creation, fetch_top_holders, check_liquidity_lock
-from services.scraping_service import scrape_additional_data
+from services.scraping_service import scrape_bubblemaps_data
 import re
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="BSC Token Insight API", version="1.0.0")
 app.add_middleware(
@@ -26,8 +30,10 @@ class TokenRequest(BaseModel):
 
     @validator('address')
     def validate_address(cls, v):
+        logger.info(f"Validating address: {v}")
         if not re.match(r'^0x[a-fA-F0-9]{40}$', v):
-            raise ValueError('Invalid BSC contract address')
+            logger.warning(f"Invalid BSC address provided: {v}")
+            raise ValueError('Invalid BSC address. Enter a valid BSC address')
         return v
 
 class TokenResponse(BaseModel):
@@ -41,12 +47,13 @@ async def get_token_info(request: TokenRequest):
 
     # Check cache
     if address in cache:
+        logger.info(f"Cache hit for address: {address}")
         cached_data = cache[address]
         cached_data['updated_at'] = datetime.utcnow().isoformat()
         return TokenResponse(success=True, message="Data fetched from cache", data=cached_data)
 
     try:
-        # Fetch from APIs concurrently - optimize by skipping slow calls for speed
+        # Fetch from APIs concurrently
         dexscreener_data, bscscan_data = await asyncio.gather(
             fetch_from_dexscreener(address),
             fetch_from_bscscan(address)
@@ -56,38 +63,40 @@ async def get_token_info(request: TokenRequest):
         liquidity_lock = 'Unknown'
         contract_info = {'creator': 'Unknown', 'creation_date': 'Unknown'}
 
-        # Combine data
+        # Combine data - ensure all values are strings
         combined_data = {
-            'name': bscscan_data.get('name', dexscreener_data.get('name', '')),
-            'symbol': bscscan_data.get('symbol', dexscreener_data.get('symbol', '')),
+            'name': str(bscscan_data.get('name', dexscreener_data.get('name', ''))),
+            'symbol': str(bscscan_data.get('symbol', dexscreener_data.get('symbol', ''))),
             'contract_address': address,
-            'verified': bscscan_data.get('verified', False),
-            'liquidity': dexscreener_data.get('liquidity', ''),
-            'volume': dexscreener_data.get('volume', ''),
-            'market_cap': dexscreener_data.get('market_cap', ''),
-            'holders': bscscan_data.get('holders', ''),
-            'liquidity_lock': liquidity_lock,
-            'website': bscscan_data.get('website', ''),
-            'socials': bscscan_data.get('socials', {}),
-            'creator': contract_info.get('creator', 'Unknown'),
-            'creation_date': contract_info.get('creation_date', 'Unknown'),
-            'top_holders': top_holders,
-            'pair_address': dexscreener_data.get('pair_address', ''),
+            'liquidity': str(dexscreener_data.get('liquidity', '')),
+            'volume': str(dexscreener_data.get('volume', '')),
+            'holders': str(bscscan_data.get('holders', '')),
+            'pair_address': str(dexscreener_data.get('pair_address', '')),
         }
 
-        # If missing socials, scrape
-        if not combined_data.get('socials'):
-            scraped_data = scrape_additional_data(address)
-            combined_data['socials'] = scraped_data.get('socials', {})
+        # Get Bubblemaps URL
+        combined_data['bubblemaps_url'] = f"https://v2.bubblemaps.io/token/{address}"
 
         combined_data['updated_at'] = datetime.utcnow().isoformat()
+
+        # Ensure serializable data
+        for key in combined_data:
+            if isinstance(combined_data[key], (dict, list)):
+                combined_data[key] = str(combined_data[key])
 
         # Cache the result
         cache[address] = combined_data
 
-        return TokenResponse(success=True, message="Data fetched successfully", data=combined_data)
+        logger.info(f"Successfully fetched data for token: {combined_data.get('name', 'Unknown')} ({address})")
+        try:
+            response = TokenResponse(success=True, message="Data fetched successfully", data=combined_data)
+            return response
+        except Exception as resp_err:
+            logger.error(f"TokenResponse creation error: {resp_err}")
+            raise
 
     except Exception as e:
+        logger.error(f"Error in get_token_info for {address}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
