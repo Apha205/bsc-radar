@@ -88,7 +88,7 @@ export default function Home() {
 
   return (
     <>
-    <div className="min-h-screen bg-gradient-to-b from-[#0A0F0A] to-[#1A2E1A] text-white flex flex-col relative">
+    <div className="min-h-screen bg-gradient-to-b from-[#0A0F0A] to-[#1A2E1A] text-white flex flex-col relative overflow-hidden">
       {/* Subtle gradient animation */}
       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-900/10 to-transparent animate-pulse"></div>
       {/* Radar-like glow pattern */}
@@ -97,6 +97,14 @@ export default function Home() {
         <div className="absolute top-0 right-1/4 w-px h-full bg-gradient-to-b from-green-400/50 to-transparent"></div>
         <div className="absolute top-1/4 left-0 h-px w-full bg-gradient-to-r from-transparent via-green-400/30 to-transparent"></div>
         <div className="absolute bottom-1/4 left-0 h-px w-full bg-gradient-to-r from-transparent via-green-400/30 to-transparent"></div>
+      </div>
+
+      {/* Interactive Breathing Background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#00FF88]/5 via-transparent to-[#00FF88]/5 animate-breath"></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#00FF88]/3 rounded-full blur-3xl animate-breath-delayed"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-[#00FF88]/2 rounded-full blur-3xl animate-breath-slow"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[#00FF88]/4 rounded-full blur-2xl animate-breath-fast"></div>
       </div>
 
       {/* Header */}
@@ -125,11 +133,12 @@ export default function Home() {
       <div className="flex-1 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 relative z-20 py-10 overflow-y-auto">
         {/* Main Heading */}
         <h2
-          className={`font-black text-white text-center leading-tight mb-6 transition-opacity duration-1000 ${showHeading ? 'opacity-100' : 'opacity-0'}`}
+          className={`font-black text-white text-center leading-tight mb-2 transition-opacity duration-1000 ${showHeading ? 'opacity-100' : 'opacity-0'}`}
           style={{
-            fontFamily: 'Archivo Black, sans-serif',
+            fontFamily: 'Poller One, sans-serif',
             lineHeight: '2em',
-            fontSize: 'clamp(1.5rem, 5vw, 4rem)'
+            fontSize: 'clamp(1.5rem, 5vw, 4rem)',
+            textAlign: 'center'
           }}
         >
           Built for degens who need quick info on tokens.
@@ -137,7 +146,7 @@ export default function Home() {
 
         {/* Subheading */}
         <p
-          className="font-normal text-[#D0FFD8] text-center mb-10"
+          className="font-normal text-[#D0FFD8] text-center mb-4"
           style={{
             fontFamily: 'Inter, Poppins, sans-serif',
             fontSize: 'clamp(1rem, 2.5vw, 1.25rem)'

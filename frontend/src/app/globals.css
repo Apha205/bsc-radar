@@ -48,3 +48,29 @@ body {
 .animate-fade-in-up {
   animation: fade-in-up 0.6s ease-out;
 }
+
+/* Breathing background animations */
+@keyframes breath {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.05); }
+}
+
+@keyframes breath-delayed {
+  0%, 100% { opacity: 0.2; transform: scale(1) translate(0, 0); }
+  50% { opacity: 0.4; transform: scale(1.1) translate(10px, -10px); }
+}
+
+@keyframes breath-slow {
+  0%, 100% { opacity: 0.15; transform: scale(1) translate(0, 0); }
+  50% { opacity: 0.3; transform: scale(1.08) translate(-15px, 15px); }
+}
+
+@keyframes breath-fast {
+  0%, 100% { opacity: 0.25; transform: scale(1) translate(0, 0); }
+  50% { opacity: 0.5; transform: scale(1.12) translate(5px, 5px); }
+}
+
+.animate-breath { animation: breath 8s ease-in-out infinite; }
+.animate-breath-delayed { animation: breath-delayed 10s ease-in-out infinite; }
+.animate-breath-slow { animation: breath-slow 12s ease-in-out infinite; }
+.animate-breath-fast { animation: breath-fast 6s ease-in-out infinite; }
